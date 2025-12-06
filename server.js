@@ -75,6 +75,12 @@ const startServer = async () => {
         // Create tables if they don't exist
         await User.createTable();
         await User.createRefreshTokensTable();
+        
+        // Create WhatsApp/Lead tables
+        const Lead = require('./src/models/Lead');
+        await Lead.createTable();
+        await Lead.createMessagesTable();
+        await Lead.createTimelineTable();
 
         // Start server
         app.listen(PORT, () => {

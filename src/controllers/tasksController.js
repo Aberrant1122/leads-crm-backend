@@ -140,6 +140,47 @@ const updateTask = async (req, res) => {
 };
 
 /**
+ * Update task status only
+ */
+const updateTaskStatus = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const taskId = parseInt(req.params.id);
+        const { status } = req.body;
+
+        // Validation
+        const validStatuses = ['Pending', 'In Progress', 'Completed'];
+        if (!status || !validStatuses.includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Valid status is required (Pending, In Progress, Completed)'
+            });
+        }
+
+        const updated = await tasksService.updateTaskStatus(taskId, userId, status);
+
+        if (!updated) {
+            return res.status(404).json({
+                success: false,
+                message: 'Task not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Task status updated successfully'
+        });
+    } catch (error) {
+        console.error('Error updating task status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update task status',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+/**
  * Delete a task
  */
 const deleteTask = async (req, res) => {
@@ -175,5 +216,6 @@ module.exports = {
     getTaskById,
     createTask,
     updateTask,
+    updateTaskStatus,
     deleteTask
 };

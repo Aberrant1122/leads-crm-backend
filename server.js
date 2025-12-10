@@ -25,6 +25,11 @@ app.use((req, res, next) => {
     next();
 });
 
+// Public health check (no auth required)
+app.get('/api/health', (req, res) => {
+    res.json({ success: true, message: 'API is running' });
+});
+
 // API Routes
 app.use('/api', routes);
 

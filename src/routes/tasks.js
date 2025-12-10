@@ -18,6 +18,9 @@ router.post('/', tasksController.createTask);
 // Update task
 router.put('/:id', tasksController.updateTask);
 
+// Update task status only
+router.patch('/:id/status', tasksController.updateTaskStatus);
+
 // Delete task
 router.delete('/:id', tasksController.deleteTask);
 

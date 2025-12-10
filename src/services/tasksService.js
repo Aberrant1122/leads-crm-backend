@@ -102,6 +102,18 @@ const updateTask = async (taskId, userId, taskData) => {
 };
 
 /**
+ * Update task status only
+ */
+const updateTaskStatus = async (taskId, userId, status) => {
+    const [result] = await pool.query(
+        'UPDATE tasks SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?',
+        [status, taskId, userId]
+    );
+
+    return result.affectedRows > 0;
+};
+
+/**
  * Delete a task
  */
 const deleteTask = async (taskId, userId) => {
@@ -118,5 +130,6 @@ module.exports = {
     getTaskById,
     createTask,
     updateTask,
+    updateTaskStatus,
     deleteTask
 };

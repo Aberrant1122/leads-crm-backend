@@ -6,6 +6,8 @@ const pipelineRoutes = require('./pipelineRoutes');
 const analyticsRoutes = require('./analyticsRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
 const leadsRoutes = require('./leadsRoutes');
+const userRoutes = require('./userRoutes');
+const tasksRoutes = require('./tasks');
 
 // Mount auth routes
 router.use('/auth', authRoutes);
@@ -24,6 +26,12 @@ router.use('/', dashboardRoutes);
 
 // Mount leads routes
 router.use('/', leadsRoutes);
+
+// Mount user routes
+router.use('/', userRoutes);
+
+// Mount tasks routes
+router.use('/tasks', tasksRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

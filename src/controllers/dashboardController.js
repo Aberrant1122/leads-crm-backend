@@ -279,3 +279,70 @@ exports.getPipelineOverview = async (req, res) => {
         });
     }
 };
+
+/**
+ * Get upcoming tasks for dashboard
+ */
+exports.getUpcomingTasks = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const limit = parseInt(req.query.limit) || 5;
+
+        const [tasks] = await pool.query(`
+            SELECT 
+                t.id,
+                t.title,
+                t.description,
+                t.due_date,
+                t.priority,
+                t.status,
+                t.lead_id,
+                l.name as lead_name,
+                t.created_at,
+                t.updated_at
+            FROM tasks t
+            LEFT JOIN leads l ON t.lead_id = l.id
+            WHERE t.user_id = ? 
+            AND t.status IN ('Pending', 'In Progress')
+            AND (t.due_date IS NULL OR t.due_date >= CURDATE())
+            ORDER BY 
+                CASE 
+                    WHEN t.due_date IS NULL THEN 1 
+                    ELSE 0 
+                END,
+                t.due_date ASC,
+                CASE t.priority 
+                    WHEN 'High' THEN 1 
+                    WHEN 'Medium' THEN 2 
+                    WHEN 'Low' THEN 3 
+                END
+            LIMIT ?
+        `, [userId, limit]);
+
+        // Format tasks for frontend
+        const formattedTasks = tasks.map(task => ({
+            id: task.id,
+            title: task.title,
+            description: task.description || '',
+            dueDate: task.due_date ? task.due_date.toISOString().split('T')[0] : null,
+            priority: task.priority,
+            status: task.status,
+            leadId: task.lead_id,
+            leadName: task.lead_name || 'No Lead'
+        }));
+
+        res.json({
+            success: true,
+            data: formattedTasks
+        });
+    } catch (error) {
+        console.error('Error fetching upcoming tasks:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch upcoming tasks',
+            error: error.message
+        });
+    }
+};
+
+

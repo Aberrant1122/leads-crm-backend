@@ -12,4 +12,9 @@ router.get('/dashboard/kpis', authMiddleware, dashboardController.getKPIs);
 // Get pipeline overview for dashboard
 router.get('/dashboard/pipeline-overview', authMiddleware, dashboardController.getPipelineOverview);
 
+// Get upcoming tasks for dashboard
+router.get('/dashboard/upcoming-tasks', authMiddleware, dashboardController.getUpcomingTasks);
+
+
+
 module.exports = router;

@@ -1,5 +1,5 @@
 const { pool } = require('../config/database');
-const { hashPassword } = require('../utils/passwordUtils');
+const { hashPassword, comparePassword } = require('../utils/passwordUtils');
 
 class User {
     /**
@@ -49,6 +49,59 @@ class User {
         const query = 'SELECT id, name, email, role, created_at, updated_at FROM users WHERE id = ?';
         const [rows] = await pool.query(query, [id]);
         return rows.length > 0 ? rows[0] : null;
+    }
+
+    /**
+     * Find user by ID with password (for authentication)
+     * @param {number} id - User ID
+     * @returns {object|null} User object with password or null
+     */
+    static async findByIdWithPassword(id) {
+        const query = 'SELECT * FROM users WHERE id = ?';
+        const [rows] = await pool.query(query, [id]);
+        return rows.length > 0 ? rows[0] : null;
+    }
+
+    /**
+     * Update user
+     * @param {number} id - User ID
+     * @param {object} updateData - Data to update
+     * @returns {boolean} Success status
+     */
+    static async update(id, updateData) {
+        const fields = [];
+        const values = [];
+
+        Object.keys(updateData).forEach(key => {
+            fields.push(`${key} = ?`);
+            values.push(updateData[key]);
+        });
+
+        values.push(id);
+
+        const query = `UPDATE users SET ${fields.join(', ')} WHERE id = ?`;
+        const [result] = await pool.query(query, values);
+        
+        return result.affectedRows > 0;
+    }
+
+    /**
+     * Hash password
+     * @param {string} password - Plain password
+     * @returns {string} Hashed password
+     */
+    static async hashPassword(password) {
+        return await hashPassword(password);
+    }
+
+    /**
+     * Validate password
+     * @param {string} plainPassword - Plain password
+     * @param {string} hashedPassword - Hashed password
+     * @returns {boolean} Is valid
+     */
+    static async validatePassword(plainPassword, hashedPassword) {
+        return await comparePassword(plainPassword, hashedPassword);
     }
 
     /**

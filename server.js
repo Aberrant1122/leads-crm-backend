@@ -82,6 +82,10 @@ const startServer = async () => {
         await Lead.createMessagesTable();
         await Lead.createTimelineTable();
 
+        // Create Tasks table
+        const Task = require('./src/models/Task');
+        await Task.createTable();
+
         // Start server
         app.listen(PORT, () => {
             console.log(`\n🚀 Server running on port ${PORT}`);
